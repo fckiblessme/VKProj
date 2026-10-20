@@ -27,11 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.overflow.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.ui.tooling.preview.Preview
 import com.kitchino.vkproj.model.App
 import com.kitchino.vkproj.model.AppRepository
 import com.kitchino.vkproj.R
@@ -60,7 +62,7 @@ fun AppListScreen() {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 ),
-                leading = {
+                navigationIcon = {
                     Icon(
                         imageVector = Icons.Default.Apps,
                         contentDescription = stringResource(R.string.current_app_icon_desc),
@@ -132,7 +134,7 @@ fun AppItem(app: App) {
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
-                    overflow = androidx.compose.ui.text.overflow.TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis
                 )
                 
                 Text(
@@ -140,7 +142,7 @@ fun AppItem(app: App) {
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
-                    overflow = androidx.compose.ui.text.overflow.TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis
                 )
                 
                 Text(
