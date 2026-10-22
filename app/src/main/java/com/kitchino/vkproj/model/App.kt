@@ -78,4 +78,71 @@ object AppRepository {
             icon = Icons.Filled.AccountCircle
         )
     )
+
+    // Showcase apps - 9 apps for 3 pages (3 apps per page)
+    val showcaseApps = listOf(
+        App(
+            id = 101,
+            name = "VK Клипы",
+            description = "Короткие вертикальные видео",
+            category = "Видео",
+            icon = Icons.Filled.VideogameAsset
+        ),
+        App(
+            id = 102,
+            name = "VK Play",
+            description = "Игры и стримы",
+            category = "Игры",
+            icon = Icons.Filled.VideogameAsset
+        ),
+        App(
+            id = 103,
+            name = "VK Мессенджер",
+            description = "Личные и групповые чаты",
+            category = "Социальные сети",
+            icon = Icons.Filled.Chat
+        ),
+        App(
+            id = 104,
+            name = "VK ID",
+            description = "Единый вход во все сервисы",
+            category = "Безопасность",
+            icon = Icons.Filled.AccountCircle
+        ),
+        App(
+            id = 105,
+            name = "VK Реклама",
+            description = "Продвижение бизнеса",
+            category = "Бизнес",
+            icon = Icons.Filled.Settings
+        ),
+        App(
+            id = 106,
+            name = "VK Карта",
+            description = "Карта с кэшбэком",
+            category = "Финансы",
+            icon = Icons.Filled.ShoppingCart
+        ),
+        App(
+            id = 107,
+            name = "VK Документы",
+            description = "Облачное хранилище файлов",
+            category = "Продуктивность",
+            icon = Icons.Filled.Home
+        ),
+        App(
+            id = 108,
+            name = "VK Подкасты",
+            description = "Аудио шоу и подкасты",
+            category = "Музыка",
+            icon = Icons.Filled.MusicNote
+        ),
+        App(
+            id = 109,
+            name = "VK Мини-аппы",
+            description = "Приложения внутри VK",
+            category = "Разное",
+            icon = Icons.Filled.CameraAlt
+        )
+    )
 }

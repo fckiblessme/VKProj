@@ -24,7 +24,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,15 +31,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.overflow.TextOverflow
+import androidx.compose.ui.geometry.Offset
 import com.kitchino.vkproj.model.App
 import com.kitchino.vkproj.model.AppRepository
 import com.kitchino.vkproj.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppListScreen() {
+fun AppListScreen(onAppClick: (App) -> Unit) {
     val apps = AppRepository.sampleApps
     
     Surface(
@@ -83,7 +85,7 @@ fun AppListScreen() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(apps) { app ->
-                    AppItem(app = app)
+                    AppItem(app = app, onClick = { onAppClick(app) })
                 }
             }
         }
@@ -92,9 +94,13 @@ fun AppListScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppItem(app: App) {
+fun AppItem(app: App, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = { _: Offset -> onClick() })
+            },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         ),
@@ -160,6 +166,6 @@ fun AppItem(app: App) {
 @Preview(showBackground = true)
 fun AppListScreenPreview() {
     com.kitchino.vkproj.ui.theme.VKProjTheme {
-        AppListScreen()
+        AppListScreen(onAppClick = {})
     }
 }

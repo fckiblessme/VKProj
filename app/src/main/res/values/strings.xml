@@ -2,4 +2,7 @@
     <string name="app_name">VKProj</string>
     <string name="app_list_title">Список приложений</string>
     <string name="current_app_icon_desc">Иконка текущего приложения</string>
+    <string name="back_button_desc">Назад</string>
+    <string name="showcase_title">Витрина</string>
+    <string name="install_button">Установить</string>
 </resources>
