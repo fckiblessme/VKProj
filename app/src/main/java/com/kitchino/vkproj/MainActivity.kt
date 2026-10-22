@@ -4,13 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.kitchino.vkproj.model.AppRepository
+import com.kitchino.vkproj.ui.screens.AppDetailScreen
+import com.kitchino.vkproj.ui.screens.AppListScreen
 import com.kitchino.vkproj.ui.theme.VKProjTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +18,31 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VKProjTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                NavHost(navController, startDestination = "app_list") {
+                    composable("app_list") {
+                        AppListScreen(onAppClick = { app ->
+                            navController.navigate("app_detail/${app.id}")
+                        })
+                    }
+                    composable(
+                        route = "app_detail/{appId}"
+                    ) { backStackEntry ->
+                        val appId = backStackEntry.getString()?.getInt("appId") ?: 1
+                        val app = AppRepository.sampleApps.firstOrNull { it.id == appId }
+                            ?: AppRepository.sampleApps[0]
+                        AppDetailScreen(
+                            app = app,
+                            onBackClick = { navController.popBackStack() },
+                            onShowcaseAppClick = { navController.navigate("app_list") }
+                        )
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VKProjTheme {
-        Greeting("Android")
+    private fun String?.getInt(key: String): Int? {
+        return this?.split("/")?.lastOrNull()?.toIntOrNull()
     }
 }
