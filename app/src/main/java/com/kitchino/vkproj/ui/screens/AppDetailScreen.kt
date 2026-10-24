@@ -36,15 +36,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import com.kitchino.vkproj.model.App
 import com.kitchino.vkproj.model.AppRepository
 import com.kitchino.vkproj.R
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.overflow.TextOverflow
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.geometry.Offset
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -234,18 +233,26 @@ fun ShowcasePager(
     apps: List<App>,
     onAppClick: () -> Unit
 ) {
-    // Use LazyHorizontalGrid for paging-like behavior (3 columns)
-    LazyHorizontalGrid(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(220.dp),
-        cells = GridCells.Fixed(3),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(apps) { app ->
-            ShowcaseAppItem(app = app, onClick = onAppClick)
+    // Фиксированно 9 приложений -> 3 страницы по 3 приложения.
+    val pages = apps.chunked(3)
+    val pagerState = rememberPagerState(pageCount = { pages.size })
+
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier.fillMaxWidth(),
+        pageSpacing = 12.dp
+    ) { page ->
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            pages[page].forEach { app ->
+                ShowcaseAppItem(
+                    app = app,
+                    onClick = onAppClick,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
@@ -254,10 +261,11 @@ fun ShowcasePager(
 @Composable
 fun ShowcaseAppItem(
     app: App,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(200.dp)
             .pointerInput(Unit) {

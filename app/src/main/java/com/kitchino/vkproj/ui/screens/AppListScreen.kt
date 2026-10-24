@@ -1,58 +1,107 @@
 package com.kitchino.vkproj.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.overflow.TextOverflow
-import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kitchino.vkproj.R
 import com.kitchino.vkproj.model.App
 import com.kitchino.vkproj.model.AppRepository
-import com.kitchino.vkproj.R
 
+/**
+ * Экран «Список приложений» с presentation-слоем на ViewModel (MVVM).
+ *
+ * Состояние хранится в [AppListViewModel], поэтому контент сохраняется при
+ * повороте экрана и не загружается повторно. Snackbar показывается по
+ * единоразовому событию, поэтому не появляется повторно после поворота.
+ */
+@Composable
+fun AppListScreen(
+    onAppClick: (App) -> Unit,
+    viewModel: AppListViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage = stringResource(R.string.app_list_snackbar)
+
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                AppListEvent.ShowToolbarSnackbar ->
+                    snackbarHostState.showSnackbar(snackbarMessage)
+            }
+        }
+    }
+
+    AppListContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onToolbarClick = viewModel::onToolbarClick,
+        onAppClick = onAppClick,
+    )
+}
+
+/**
+ * Stateless-часть экрана: отрисовывает переданное состояние.
+ * Отделена от [AppListScreen], чтобы её можно было использовать в preview.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppListScreen(onAppClick: (App) -> Unit) {
-    val apps = AppRepository.sampleApps
-    
-    Surface(
+fun AppListContent(
+    uiState: AppListUiState,
+    snackbarHostState: SnackbarHostState,
+    onToolbarClick: () -> Unit,
+    onAppClick: (App) -> Unit,
+) {
+    Scaffold(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Toolbar with accent background
+        containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
             TopAppBar(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onToolbarClick),
                 title = {
                     Text(
                         text = stringResource(R.string.app_list_title),
@@ -75,17 +124,26 @@ fun AppListScreen(onAppClick: (App) -> Unit) {
                     )
                 }
             )
-            
-            // App List
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(apps) { app ->
-                    AppItem(app = app, onClick = { onAppClick(app) })
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(uiState.apps, key = { it.id }) { app ->
+                        AppItem(app = app, onClick = { onAppClick(app) })
+                    }
                 }
             }
         }
@@ -126,7 +184,7 @@ fun AppItem(app: App, onClick: () -> Unit) {
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
-            
+
             // App Info
             Column(
                 modifier = Modifier
@@ -142,7 +200,7 @@ fun AppItem(app: App, onClick: () -> Unit) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                
+
                 Text(
                     text = app.description,
                     fontSize = 14.sp,
@@ -150,7 +208,7 @@ fun AppItem(app: App, onClick: () -> Unit) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-                
+
                 Text(
                     text = app.category,
                     fontSize = 12.sp,
@@ -166,6 +224,14 @@ fun AppItem(app: App, onClick: () -> Unit) {
 @Preview(showBackground = true)
 fun AppListScreenPreview() {
     com.kitchino.vkproj.ui.theme.VKProjTheme {
-        AppListScreen(onAppClick = {})
+        AppListContent(
+            uiState = AppListUiState(
+                apps = AppRepository.sampleApps,
+                isLoading = false
+            ),
+            snackbarHostState = remember { SnackbarHostState() },
+            onToolbarClick = {},
+            onAppClick = {}
+        )
     }
 }

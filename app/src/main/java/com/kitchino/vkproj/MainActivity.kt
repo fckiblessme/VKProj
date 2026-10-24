@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.kitchino.vkproj.model.AppRepository
 import com.kitchino.vkproj.ui.screens.AppDetailScreen
 import com.kitchino.vkproj.ui.screens.AppListScreen
@@ -26,23 +28,20 @@ class MainActivity : ComponentActivity() {
                         })
                     }
                     composable(
-                        route = "app_detail/{appId}"
+                        route = "app_detail/{appId}",
+                        arguments = listOf(navArgument("appId") { type = NavType.IntType })
                     ) { backStackEntry ->
-                        val appId = backStackEntry.getString()?.getInt("appId") ?: 1
+                        val appId = backStackEntry.arguments?.getInt("appId") ?: 1
                         val app = AppRepository.sampleApps.firstOrNull { it.id == appId }
-                            ?: AppRepository.sampleApps[0]
+                            ?: AppRepository.sampleApps.first()
                         AppDetailScreen(
                             app = app,
                             onBackClick = { navController.popBackStack() },
-                            onShowcaseAppClick = { navController.navigate("app_list") }
+                            onShowcaseAppClick = { navController.popBackStack() }
                         )
                     }
                 }
             }
         }
-    }
-
-    private fun String?.getInt(key: String): Int? {
-        return this?.split("/")?.lastOrNull()?.toIntOrNull()
     }
 }

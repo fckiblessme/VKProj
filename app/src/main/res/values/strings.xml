@@ -5,4 +5,5 @@
     <string name="back_button_desc">Назад</string>
     <string name="showcase_title">Витрина</string>
     <string name="install_button">Установить</string>
+    <string name="app_list_snackbar">Тулбар нажат — состояние хранится в ViewModel</string>
 </resources>
