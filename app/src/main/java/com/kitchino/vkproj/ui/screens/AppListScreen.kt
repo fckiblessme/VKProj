@@ -28,8 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,22 +38,25 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.layout.Row
 import com.kitchino.vkproj.R
-import com.kitchino.vkproj.model.App
-import com.kitchino.vkproj.model.AppRepository
+import com.kitchino.vkproj.domain.model.App
+import com.kitchino.vkproj.presentation.model.AppListEvent
+import com.kitchino.vkproj.presentation.model.AppListUiState
+import com.kitchino.vkproj.presentation.viewmodel.AppListViewModel
 
 /**
- * Экран «Список приложений» с presentation-слоем на ViewModel (MVVM).
+ * Экран «Список приложений» с presentation-слоем на ViewModel (MVVM + Clean Architecture).
  *
- * Состояние хранится в [AppListViewModel], поэтому контент сохраняется при
+ * Состояние хранится в [AppListUiState], поэтому контент сохраняется при
  * повороте экрана и не загружается повторно. Snackbar показывается по
- * единоразовому событию, поэтому не появляется повторно после поворота.
+ * единоразовому событию через [AppListEvent], поэтому не появляется
+ * повторно после поворота.
  */
 @Composable
 fun AppListScreen(
@@ -220,13 +223,14 @@ fun AppItem(app: App, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview(showBackground = true)
 fun AppListScreenPreview() {
     com.kitchino.vkproj.ui.theme.VKProjTheme {
         AppListContent(
             uiState = AppListUiState(
-                apps = AppRepository.sampleApps,
+                apps = emptyList<App>(),
                 isLoading = false
             ),
             snackbarHostState = remember { SnackbarHostState() },
