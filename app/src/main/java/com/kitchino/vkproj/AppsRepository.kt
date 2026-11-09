@@ -5,14 +5,14 @@ import com.kitchino.vkproj.model.AppRepository
 import jakarta.inject.Inject
 
 interface AppsRepository {
-    fun getApp() : List<App>
+    suspend fun getApp() : List<App>
 }
 
 class AppsRepositoryImpl @Inject constructor(
-    private val mapper: AppsMapper
+    private val api: CatalogApi
 ) : AppsRepository {
-    override fun getApp(): List<App> {
-        return mapper.map()
+    override suspend fun getApp(): List<App> {
+        return api.getCatalog()
     }
 }
 
