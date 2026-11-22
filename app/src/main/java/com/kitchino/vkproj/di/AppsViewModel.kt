@@ -2,7 +2,8 @@ package com.kitchino.vkproj.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kitchino.vkproj.AppsRepository
+import com.kitchino.vkproj.domain.GetAppsUseCase
+import com.kitchino.vkproj.domain.LoadRatingsUseCase
 import com.kitchino.vkproj.model.App
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,8 @@ data class RatingsState(
 
 @HiltViewModel
 class AppsViewModel @Inject constructor(
-    private val repository: AppsRepository
+    private val getAppsUseCase: GetAppsUseCase,
+    private val loadRatingsUseCase: LoadRatingsUseCase,
 ) : ViewModel() {
     private val _apps = MutableStateFlow<List<App>>(emptyList())
     val apps: StateFlow<List<App>> = _apps.asStateFlow()
@@ -36,7 +38,7 @@ class AppsViewModel @Inject constructor(
     fun loadApps() {
         viewModelScope.launch {
             try {
-                _apps.value = repository.getApp()
+                _apps.value = getAppsUseCase()
             } catch (e: Exception) {
                 _apps.value = emptyList()
             }
@@ -49,7 +51,7 @@ class AppsViewModel @Inject constructor(
             if (ids.isEmpty()) return@launch
 
             _ratings.update { it.copy(isLoading = true) }
-            val result = repository.loadRatingsSequentially(ids)
+            val result = loadRatingsUseCase.sequentially(ids)
             _ratings.update {
                 it.copy(
                     ratings = result.ratings,
@@ -67,7 +69,7 @@ class AppsViewModel @Inject constructor(
             if (ids.isEmpty()) return@launch
 
             _ratings.update { it.copy(isLoading = true) }
-            val result = repository.loadRatingsInParallel(ids)
+            val result = loadRatingsUseCase.inParallel(ids)
             _ratings.update {
                 it.copy(
                     ratings = result.ratings,

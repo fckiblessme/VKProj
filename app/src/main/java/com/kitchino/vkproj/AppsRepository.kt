@@ -1,5 +1,6 @@
 package com.kitchino.vkproj
 
+import com.kitchino.vkproj.data.AppMapper
 import com.kitchino.vkproj.model.App
 import com.kitchino.vkproj.model.AppRepository
 import jakarta.inject.Inject
@@ -21,11 +22,16 @@ interface AppsRepository {
 }
 
 class AppsRepositoryImpl @Inject constructor(
-    private val api: CatalogApi
+    private val api: CatalogApi,
+    private val mapper: AppMapper,
 ) : AppsRepository {
     override suspend fun getApp(): List<App> {
-        // TODO: вернуть api.getCatalog(), когда формат ответа сервера совпадёт с моделью App
-        return AppRepository.sampleApps
+        return try {
+            mapper.dtoListToAppList(api.getCatalog())
+        } catch (e: Exception) {
+            // сервер пока отдаёт несовместимый формат — показываем локальный список
+            AppRepository.sampleApps
+        }
     }
 
     override suspend fun getRating(id: Int): Float {
@@ -50,11 +56,5 @@ class AppsRepositoryImpl @Inject constructor(
             }
         }
         return RatingResult(ratings, time)
-    }
-}
-
-class AppsMapper @Inject constructor() {
-    fun map(): List<App> {
-        return AppRepository.sampleApps
     }
 }
