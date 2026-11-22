@@ -2,12 +2,15 @@ package com.kitchino.vkproj.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -76,6 +79,27 @@ object AppRepository {
             description = "Все проекты экосистемы",
             category = "Разное",
             icon = Icons.Filled.AccountCircle
+        ),
+        App(
+            id = 9,
+            name = "VK Диск",
+            description = "Файлы и документы всегда под рукой",
+            category = "Продуктивность",
+            icon = Icons.Filled.Cloud
+        ),
+        App(
+            id = 10,
+            name = "VK Ads",
+            description = "Реклама и продвижение в проектах VK",
+            category = "Реклама",
+            icon = Icons.Filled.BarChart
+        ),
+        App(
+            id = 11,
+            name = "VK Бро",
+            description = "Игры и развлекательные мини-приложения",
+            category = "Развлечения",
+            icon = Icons.Filled.SportsEsports
         )
     )
 }

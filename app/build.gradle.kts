@@ -60,4 +60,5 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     // Gson (если ещё нет)
     implementation("com.google.code.gson:gson:2.11.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 }
